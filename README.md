@@ -37,6 +37,8 @@ Use [M-Flasher](https://github.com/jvitkauskas/m-flasher/releases/latest) to acc
 3. Choose **Install firmware (.fwsc)** and select the downloaded package.
 4. Wait for verification and restart.
 
+> **Persistent-storage warning:** A firmware can boot successfully and still be incompatible with the installed flash chip. It may accept presets or projects but keep them only in RAM, so they disappear after power-off. Save a test preset, power-cycle the FM-1, and verify it is still present. Check the flash JEDEC ID if storage behaves unexpectedly.
+
 The script verifies that a file matches the catalogue, not that the firmware is compatible with every hardware revision or flash chip.
 
 MIT licensed. No firmware images are bundled.
@@ -81,6 +83,8 @@ MIT licensed. No firmware images are bundled.
 2. 打开 **Download Mode**。
 3. 点击 **Install firmware (.fwsc)** 并选择已下载的固件。
 4. 等待校验完成并重启。
+
+> **存储警告：** 固件能够刷入并正常启动，并不代表闪存芯片兼容。某些固件会接受预设或工程，但只在 RAM 中保存，关机后随即丢失。请保存一个测试预设，重启 FM-1 后确认它仍然存在；如果存储异常，应检查闪存 JEDEC ID。
 
 脚本只能证明文件与网页目录一致，不能保证固件适配所有硬件版本或闪存芯片。
 
