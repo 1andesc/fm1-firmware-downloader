@@ -1,0 +1,249 @@
+diff --git a/firmware/hal/fm1_flash_id.h b/firmware/hal/fm1_flash_id.h
+new file mode 100644
+index 0000000..b1d32ee
+--- /dev/null
++++ b/firmware/hal/fm1_flash_id.h
+@@ -0,0 +1,14 @@
++/* SPDX-License-Identifier: GPL-3.0-only */
++/* Experimental UC25HQ80 compatibility, 2026-11-02.
++ * Explicit 1 MiB SPI NOR allowlist; do NOT accept capacity byte alone.
++ * UCUN UC25HQ80 datasheet v1.2: RDID B3 60 14, 256-byte PP (02h),
++ * 4 KiB SE (20h), RDSR (05h), WREN (06h), fast read (0Bh).
++ * Does not change write ranges, status/protection bits, or erase/program commands.
++ * Specification-checked and host-tested only; NOT hardware-qualified.
++ */
++#pragma once
++#include <stdint.h>
++static inline int fl_jedec_supported(uint32_t id)
++{
++    return id == 0x856014u || id == 0xB36014u;
++}
+diff --git a/firmware/loader/loader.c b/firmware/loader/loader.c
+index ad1ffed..1ecc220 100644
+--- a/firmware/loader/loader.c
++++ b/firmware/loader/loader.c
+@@ -1,3 +1,4 @@
++#include "../hal/fm1_flash_id.h"
+ /* SPDX-License-Identifier: GPL-3.0-only
+  * Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments */
+ /* Felucca update loader (device side). Runs from RAM, started by the SPL from
+@@ -71,7 +72,7 @@ static void ldr_record_clear(void)
+ {
+     fm1_updata_parm_clear();                        /* CRC 0: the SPL ignores it on a warm reset */
+ }
+-static int ldr_flash_known(void) { return fl_jedec_ram() == 0x856014u; }   /* as the app (project.c) */
++static int ldr_flash_known(void) { return fl_jedec_supported(fl_jedec_ram()); }   /* as the app (project.c) */
+ static void ldr_progress(uint32_t done, uint32_t total) { (void)done; (void)total; ldr_poll(); }
+ #include "ldr_core.c"
+ 
+diff --git a/firmware/src/project.c b/firmware/src/project.c
+index acce904..024c871 100644
+--- a/firmware/src/project.c
++++ b/firmware/src/project.c
+@@ -1,3 +1,4 @@
++#include "../hal/fm1_flash_id.h"
+ /* SPDX-License-Identifier: GPL-3.0-only
+  * Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments */
+ /* Projects: four slots in .noinit RAM (the song sections A..D), so they survive resets and UBOOT
+@@ -790,7 +791,7 @@ UI_SMALL static void persist_boot(void)                    /* before settings_in
+ #if FELUCCA_FLASH
+     persist_t p;
+     uint32_t f = irq_save();
+-    flash_ok = FL_FAR(fl_jedec_ram)() == 0x856014u;       /* the expected 1 MiB part, else stay RAM-only */
++    flash_ok = fl_jedec_supported(FL_FAR(fl_jedec_ram)());       /* explicit supported 1 MiB parts; unknown chips stay RAM-only */
+     irq_restore(f);
+     if (!flash_ok)
+         return;
+diff --git a/firmware/src/recovery.c b/firmware/src/recovery.c
+index 8337f6a..0027b67 100644
+--- a/firmware/src/recovery.c
++++ b/firmware/src/recovery.c
+@@ -1,3 +1,4 @@
++#include "../hal/fm1_flash_id.h"
+ /* SPDX-License-Identifier: GPL-3.0-only */
+ /* Application-level recovery, not a second firmware bank. The intact app's
+  * startup, RAM flash driver and USB stack are still required. TIMER5, audio,
+@@ -64,7 +65,7 @@ static void recovery_main(void)
+     recovery_last = recovery_usb_last = fm1_ticks();
+     recovery_fraction = fm1_ms = 0;
+     /* No persist_boot or OTA cleanup: no flash write just for entering rescue. */
+-    flash_ok = FL_FAR(fl_jedec_ram)() == 0x856014u;
++    flash_ok = fl_jedec_supported(FL_FAR(fl_jedec_ram)());
+     lcd_init();
+     lcd_fill(0, 0, 240, 240, C_BLACK);
+     draw_text_box(0, 64, 240, &FONT_S, "SLOOP USB RESCUE", C_WHITE, 1);
+diff --git a/firmware/src/ui.c b/firmware/src/ui.c
+index 2750f0e..3d5940d 100644
+--- a/firmware/src/ui.c
++++ b/firmware/src/ui.c
+@@ -3,7 +3,7 @@
+ /* Felucca user interface. Four columns map to KNOB 1..4. Rendering is lazy:
+  * every element remembers what it last drew and is redrawn only on change. */
+ #ifndef FELUCCA_VERSION
+-#define FELUCCA_VERSION "SLOOP 2.8.4"  /* the beat machine firmware for the FM-1 (based on Felucca) */
++#define FELUCCA_VERSION "SLOOP 2.8.4 UC TEST"  /* the beat machine firmware for the FM-1 (based on Felucca) */
+ #endif
+ static void project_save(uint32_t slot);
+ static void arrangement_save(void);
+diff --git a/tests/editor_host.c b/tests/editor_host.c
+index 6d37989..3c43b9c 100644
+--- a/tests/editor_host.c
++++ b/tests/editor_host.c
+@@ -76,7 +76,8 @@ static uint32_t scope_w;
+ #define FL_FAR(fn) fn
+ static uint32_t fl_erases, fl_progs, fl_bad;          /* counters; fl_bad: a refused (out of range) access */
+ static int fl_fail_at = -1;                           /* > 0: the n-th program from now fails (a torn write) */
+-static uint32_t fl_jedec_ram(void) { return 0x856014u; }
++static uint32_t host_flash_id = 0x856014u; /* host-only injection, never firmware */
++static uint32_t fl_jedec_ram(void) { return host_flash_id; }
+ static void fl_plain_window_init(void) {}
+ static uint32_t irq_save(void) { return 0; }
+ static void irq_restore(uint32_t f) { (void)f; }
+diff --git a/tests/flash_id_test.c b/tests/flash_id_test.c
+new file mode 100644
+index 0000000..8c6a52e
+--- /dev/null
++++ b/tests/flash_id_test.c
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-3.0-only */
++#include <assert.h>
++#include <stdint.h>
++#include <stdio.h>
++#include "../firmware/hal/fm1_flash_id.h"
++int main(void) {
++    uint32_t id, accepted = 0;
++    for (id = 0; id <= 0xFFFFFFu; ++id) {
++        int ok = fl_jedec_supported(id);
++        assert(ok == (id == 0x856014u || id == 0xB36014u));
++        accepted += !!ok;
++    }
++    assert(accepted == 2 && !fl_jedec_supported(0xFFFFFFFFu));
++    assert(!fl_jedec_supported(0x01856014u) && !fl_jedec_supported(0x01B36014u));
++    puts("flash ID: all 24-bit IDs checked; exactly two accepted; read failures refused");
++    return 0;
++}
+diff --git a/tests/recovery_test.c b/tests/recovery_test.c
+index f981234..226fde8 100644
+--- a/tests/recovery_test.c
++++ b/tests/recovery_test.c
+@@ -99,6 +99,22 @@ int main(void)
+     assert(jedec_reads == 1 && lcd_calls == 1);
+     assert(services == 7 && sessions == 2);  /* idle startup starts no update */
+     assert(bootguard_begin(&bootguard) == BOOT_ROM);
+-    puts("recovery: boot failures, manual key, timer wrap, polled USB during OTA, retry, flash refusal and ROM fallback passed");
++    /* Same real recovery entry, both supported chips and several refusals. */
++    {
++        const uint32_t ids[] = {0x856014u, 0xB36014u, 0u, 0xFFFFFFu, 0xEF4014u, 0xB36013u, 0xB36015u};
++        const int accepted[] = {1, 1, 0, 0, 0, 0, 0};
++        unsigned k;
++        for (k = 0; k < sizeof(ids) / sizeof(ids[0]); ++k) {
++            jedec = ids[k]; retries = 0; stop_at_retry = 2;
++            if (!setjmp(exit_loop)) recovery_main();
++            assert(flash_ok == accepted[k]);
++            {
++                uint32_t before = sessions;
++                stop_at_retry = 0; usb.ota_req = 1; recovery_step();
++                assert(sessions == before + (accepted[k] ? 1u : 0u));
++            }
++        }
++    }
++    puts("recovery: existing guards plus UC25HQ80 acceptance, unknown-chip refusal and OTA gate passed");
+     return 0;
+ }
+diff --git a/tests/run_tests.sh b/tests/run_tests.sh
+index 02d813d..cefaec2 100644
+--- a/tests/run_tests.sh
++++ b/tests/run_tests.sh
+@@ -36,12 +36,18 @@ mkdir -p build/gen
+ [ build/gen/felucca_tables.h -nt tools/gen_tables.py ] || python3 tools/gen_tables.py build/gen/felucca_tables.h
+ [ build/gen/felucca_fm6.h -nt tools/gen_fm6_patches.py ] || python3 tools/gen_fm6_patches.py build/gen/felucca_fm6.h
+ 
++$CC -o "$OUT/flash_id_test" tests/flash_id_test.c
++run "explicit 1 MiB flash ID allowlist" "$OUT/flash_id_test"
++
+ $CC -o "$OUT/storage_test" tests/storage_test.c
+ run "flash storage (A/B, torn writes)" "$OUT/storage_test"
+ 
+ $CC -o "$OUT/recovery_test" tests/recovery_test.c
+ run "application USB recovery and boot-loop guard" "$OUT/recovery_test"
+ 
++$CC -O2 -w -Ibuild/gen -Ifirmware/src -Ifirmware/hal -o "$OUT/uc_persist_test" tests/uc_persist_test.c -lm
++run "supported flash IDs: real persist/project path on simulated NOR" "$OUT/uc_persist_test"
++
+ $CC -o "$OUT/arranger_test" tests/arranger_test.c
+ run "song order, timing, repeats and missing scenes" "$OUT/arranger_test"
+ $CC -O2 -w -Ibuild/gen -Ifirmware/src -o "$OUT/song_audio_test" tests/song_audio_test.c -lm
+diff --git a/tests/uc_compat_tests.sh b/tests/uc_compat_tests.sh
+new file mode 100644
+index 0000000..700e7d3
+--- /dev/null
++++ b/tests/uc_compat_tests.sh
+@@ -0,0 +1,22 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-3.0-only
++# Focused HOST/SIMULATED-NOR suite, not hardware qualification. Build firmware first.
++set -eu
++cd "$(dirname "$0")/.."
++OUT=build/host/uc
++mkdir -p "$OUT"
++CC=${CC:-cc}
++for t in flash_id storage recovery; do
++    "$CC" -O2 -Wall -Wno-unused-function -o "$OUT/${t}_test" "tests/${t}_test.c"
++    "$OUT/${t}_test"
++done
++"$CC" -O2 -w -Ibuild/gen -Ifirmware/src -Ifirmware/hal -o "$OUT/uc_persist_test" tests/uc_persist_test.c -lm
++"$OUT/uc_persist_test"
++"$CC" -O2 -w -o "$OUT/ota_test" tests/ota_test.c
++"$OUT/ota_test" build/felucca.fwsc
++head -c 200000 build/felucca.bin > "$OUT/old_app.bin"
++python3 tools/fm1pkg_make.py "$OUT/old_app.bin" build/loader/ota.bin "$OUT/old.fwsc"
++"$CC" -O2 -w -o "$OUT/ldr_test" tests/ldr_test.c
++"$OUT/ldr_test" "$OUT/old.fwsc" build/felucca.fwsc
++python3 tests/install_test.py
++echo 'ALL FOCUSED UC COMPATIBILITY HOST TESTS PASSED (NO HARDWARE TEST)'
+diff --git a/tests/uc_persist_test.c b/tests/uc_persist_test.c
+new file mode 100644
+index 0000000..39cbcc5
+--- /dev/null
++++ b/tests/uc_persist_test.c
+@@ -0,0 +1,40 @@
++/* SPDX-License-Identifier: GPL-3.0-only */
++/* Real persist_boot/project_save/proj_fetch, RAM-backed NOR, NOT a hardware test. */
++#include "editor_host.c"
++int main(void)
++{
++    const uint32_t ids[] = {0x856014u, 0xB36014u, 0u, 0xFFFFFFu, 0xEF4014u};
++    unsigned k;
++    static project_t saved;
++    for (k = 0; k < sizeof ids / sizeof ids[0]; ++k) {
++        host_flash_id = ids[k];
++        fl_erases = fl_progs = fl_bad = 0;
++        flash_ok = 0;
++        song.playing = 0; transport_req = 0;
++        memset(proj_slot, 0, sizeof proj_slot);
++        harness_init();
++        assert(flash_ok == (k < 2));
++        /* Boot must not format or erase a chip as a side effect. */
++        assert(fl_erases == 0 && fl_progs == 0);
++        song.g[G_BPM] = 137;
++        project_save(0);
++        if (k < 2) {
++            assert(fl_erases > 0 && fl_progs > 0 && fl_bad == 0);
++            saved = proj_slot[0];
++            assert(proj_ok(&saved));
++            /* Discard the cached project, re-read from simulated NOR. */
++            memset(&proj_slot[0], 0, sizeof proj_slot[0]);
++            proj_fetch(0);
++            assert(proj_ok(&proj_slot[0]));
++            assert(memcmp(&saved, &proj_slot[0], sizeof saved) == 0);
++            assert(proj_slot[0].g[G_BPM] == 137);
++            /* No write to bootloader, app or the factory tail. */
++            for (unsigned i = 0; i < 0x97000; ++i) assert(nor[i] == 0xFF);
++            for (unsigned i = 0xFF000; i < sizeof nor; ++i) assert(nor[i] == 0xFF);
++        } else {
++            assert(fl_erases == 0 && fl_progs == 0 && fl_bad == 0);
++        }
++        printf("persist ID 0x%06X: %s\n", ids[k], k < 2 ? "real project save + cache discard + NOR reload PASS" : "no erase/program on unknown chip PASS");
++    }
++    return 0;
++}
