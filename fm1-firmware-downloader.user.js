@@ -3,7 +3,11 @@
 // @namespace    fm1-firmware-downloader
 // @version      1.1.0
 // @description  Browse, verify, download, and launch installation of the latest FM-1 firmware from The Firmware Hub. Includes a native-recovery path for incompatible flash chips.
-// @author       FM-1 community
+// @author       1andesc
+// @homepageURL  https://github.com/1andesc/fm1-firmware-downloader
+// @supportURL   https://github.com/1andesc/fm1-firmware-downloader/issues
+// @updateURL    https://raw.githubusercontent.com/1andesc/fm1-firmware-downloader/main/fm1-firmware-downloader.user.js
+// @downloadURL  https://raw.githubusercontent.com/1andesc/fm1-firmware-downloader/main/fm1-firmware-downloader.user.js
 // @match        https://thefirmwarehub.com/*
 // @match        https://www.thefirmwarehub.com/*
 // @run-at       document-idle
