@@ -32,10 +32,18 @@ Some FM-1 units use an alternate flash chip, such as UC25HQ80 (`0xB36014`). Thei
 
 Use [M-Flasher](https://github.com/jvitkauskas/m-flasher/releases/latest) to access the chip's ROM download mode:
 
-1. **Back up the complete flash first.**
-2. Open **Download Mode**.
-3. Choose **Install firmware (.fwsc)** and select the downloaded package.
-4. Wait for verification and restart.
+1. Download the release for your operating system and **extract the archive**.
+2. Start M-Flasher and approve its administrator/elevation request.
+3. Connect the FM-1 directly with a USB **data** cable. Close other MIDI applications.
+4. With the FM-1 running, click **Download Mode**. If the firmware offers a recovery key combination, follow its documentation.
+5. Wait until M-Flasher detects the unit, usually shown as `WL82 UBOOT1.00`, and reads the flash.
+6. Click **Back up the whole flash** and keep the generated backup.
+7. Click **Install firmware (.fwsc)**, select the downloaded package, and review the sectors M-Flasher will change.
+8. Start the installation. Do not unplug the cable until every sector has been written and verified.
+9. Click **Restart** or power-cycle the FM-1, then verify the firmware version in the device menu.
+10. Restore the backup through M-Flasher if you need to return to the previous firmware.
+
+Official instructions: <https://github.com/jvitkauskas/m-flasher/blob/main/docs/usage.md>
 
 > **Persistent-storage warning:** A firmware can boot successfully and still be incompatible with the installed flash chip. It may accept presets or projects but keep them only in RAM, so they disappear after power-off. Save a test preset, power-cycle the FM-1, and verify it is still present. Check the flash JEDEC ID if storage behaves unexpectedly.
 
@@ -79,10 +87,18 @@ MIT licensed. No firmware images are bundled.
 
 使用 [M-Flasher](https://github.com/jvitkauskas/m-flasher/releases/latest) 进入芯片底层下载模式：
 
-1. **先完整备份闪存。**
-2. 打开 **Download Mode**。
-3. 点击 **Install firmware (.fwsc)** 并选择已下载的固件。
-4. 等待校验完成并重启。
+1. 下载对应操作系统的版本，并**解压压缩包**。
+2. 启动 M-Flasher，同意管理员权限请求。
+3. 使用 USB **数据线**直接连接 FM-1，并关闭其他 MIDI 软件。
+4. 如果 FM-1 正在运行，点击 **Download Mode**；若固件提供紧急组合键，按其说明进入。
+5. 等待 M-Flasher 识别设备并读取闪存，通常会显示 `WL82 UBOOT1.00`。
+6. 点击 **Back up the whole flash**，妥善保存完整备份。
+7. 点击 **Install firmware (.fwsc)**，选择下载的固件，并检查将要改动的扇区。
+8. 开始写入；所有扇区完成并校验前不要拔线。
+9. 点击 **Restart** 或重新开关 FM-1，在设备菜单确认固件版本。
+10. 如需恢复旧固件，使用 M-Flasher 的备份恢复功能。
+
+M-Flasher 官方说明：<https://github.com/jvitkauskas/m-flasher/blob/main/docs/usage.md>
 
 > **存储警告：** 固件能够刷入并正常启动，并不代表闪存芯片兼容。某些固件会接受预设或工程，但只在 RAM 中保存，关机后随即丢失。请保存一个测试预设，重启 FM-1 后确认它仍然存在；如果存储异常，应检查闪存 JEDEC ID。
 
