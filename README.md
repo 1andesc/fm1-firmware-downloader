@@ -1,141 +1,75 @@
+<a id="english"></a>
+
+**English** | [简体中文](#chinese)
+
 # FM-1 Firmware Downloader and Flash Helper
 
-A Tampermonkey / Violentmonkey userscript for The Firmware Hub that makes FM-1 firmware easier to browse, verify, download, and install.
-
-It was built for FM-1 owners who can see firmware on the Hub but cannot complete installation because the web update path is incompatible with some flash chips. The script keeps the one-click Hub installer available and adds a clear native-recovery route through M-Flasher.
-
-## Install the userscript
-
-With Tampermonkey or Violentmonkey installed, open:
-
-**<https://raw.githubusercontent.com/1andesc/fm1-firmware-downloader/main/fm1-firmware-downloader.user.js>**
-
-Approve the installation when your userscript manager asks.
-
-## Features
-
-- Reads the latest public firmware catalogue from The Firmware Hub on every load.
-- Adds a floating **FM-1 Firmware** panel to the Hub.
-- Adds **Download** buttons directly to firmware cards.
-- Searches by firmware name, ID, author, version, or product string.
-- Filters by firmware category.
-- Downloads the original `.fwsc` package without mirroring or modifying it.
-- Verifies file size and SHA-256 in the browser before saving.
-- Starts the Hub's own installer with **Flash via Hub**.
-- Detects common web-flash failures and points to the native recovery path.
-- Links directly to the latest M-Flasher release for hardware-incompatible update loaders.
+A Tampermonkey / Violentmonkey userscript for [The Firmware Hub](https://thefirmwarehub.com/). It adds firmware search, verified downloads, one-click Hub flashing, and a native recovery route for incompatible flash chips.
 
 ## Install
 
-1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/) in Chrome or Edge.
-2. Open the userscript install URL above.
+1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/).
+2. Open the **[userscript install link](https://raw.githubusercontent.com/1andesc/fm1-firmware-downloader/main/fm1-firmware-downloader.user.js)**.
+3. Refresh The Firmware Hub.
 
-3. Approve installation in the userscript manager.
-4. Visit or refresh [thefirmwarehub.com](https://thefirmwarehub.com/).
+## Features
 
-The floating **FM-1 Firmware** button appears at the bottom-right of the Hub. Each firmware card also receives a **Download** button.
+- Reads the latest firmware catalogue on every visit.
+- Adds search, category filters, and **Download** buttons to firmware cards.
+- Verifies file size and SHA-256 before saving.
+- **Flash via Hub** launches the Hub's native Web MIDI installer.
+- Detects common web-flash failures and links to native recovery.
 
-## How flashing works
+## Recovery for web-flash failures
 
-The script does not reimplement the FM-1 update protocol. **Flash via Hub** invokes the original install button created by The Firmware Hub, so the page remains responsible for its own confirmation dialog, Web MIDI access, transfer, and progress display.
+Some FM-1 units use an alternate flash chip, such as UC25HQ80 (`0xB36014`). Their firmware update loader may disconnect after a few write requests. This is not fixed by repeatedly pressing Install.
 
-This keeps the script useful when the Hub's HTML changes:
+Use [M-Flasher](https://github.com/jvitkauskas/m-flasher/releases/latest) to access the chip's ROM download mode:
 
-- firmware metadata comes from `/catalog.json`;
-- package URLs and hashes come from the same live catalogue;
-- installation is delegated to the Hub's current installer;
-- only the surrounding download and recovery workflow is added.
+1. **Back up the complete flash first.**
+2. Open **Download Mode**.
+3. Choose **Install firmware (.fwsc)** and select the downloaded package.
+4. Wait for verification and restart.
 
-## When web flashing fails
+The script verifies that a file matches the catalogue, not that the firmware is compatible with every hardware revision or flash chip.
 
-Some FM-1 hardware revisions use an alternate flash chip. A common example is:
+MIT licensed. No firmware images are bundled.
 
-| Item | Value |
-| --- | --- |
-| Flash chip | UC25HQ80 |
-| JEDEC ID | `0xB36014` |
-| Flash size | 1 MiB |
+---
 
-Several custom update loaders only recognize the more common `0x856014` chip. On an unsupported unit, the web installer may:
+<a id="chinese"></a>
 
-- discover the FM-1 successfully;
-- switch it into update mode;
-- begin writing;
-- disconnect after only a few read requests;
-- return to the old firmware without completing the install.
+[English](#english) | **简体中文**
 
-Repeatedly pressing Install will not fix this. Use the native recovery path instead.
+# FM-1 固件下载与刷写助手
 
-### Native recovery path with M-Flasher
+这是一个适用于 [The Firmware Hub](https://thefirmwarehub.com/) 的 Tampermonkey / Violentmonkey 用户脚本，提供固件搜索、校验下载、网页刷写和不兼容闪存芯片的底层恢复路径。
 
-[M-Flasher](https://github.com/jvitkauskas/m-flasher) communicates with the chip's built-in USB download mode instead of the incompatible firmware update loader.
+## 安装
 
-1. Download the latest M-Flasher release for Windows, macOS, or Linux.
-2. Connect the FM-1 directly to the computer with a USB **data** cable. Avoid unpowered hubs.
-3. Start M-Flasher and let it find the unit.
-4. **Back up the complete flash before writing anything.**
-5. If the FM-1 is running, use M-Flasher's **Download Mode** action.
-6. Use **Install firmware (.fwsc)** and select a package downloaded with this userscript.
-7. Wait for M-Flasher to verify the write and restart the device.
+1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)。
+2. 打开 **[用户脚本安装链接](https://raw.githubusercontent.com/1andesc/fm1-firmware-downloader/main/fm1-firmware-downloader.user.js)**。
+3. 刷新 The Firmware Hub。
 
-Direct M-Flasher link:
+## 功能
 
-<https://github.com/jvitkauskas/m-flasher/releases/latest>
+- 每次访问都读取最新固件目录。
+- 增加搜索、分类筛选和卡片旁的 **Download** 按钮。
+- 保存前校验文件大小和 SHA-256。
+- **Flash via Hub** 调用网页自带的 Web MIDI 刷写流程。
+- 检测常见失败，并提供底层恢复入口。
 
-On SLOOP, Felucca, or compatible forks, the device may also offer an emergency entry by holding the specified octave buttons while powering on. Follow the firmware's current documentation; the M-Flasher project is the authoritative source for its supported controls and recovery instructions.
+## 网页刷写失败时
 
-## Safety
+部分 FM-1 使用 UC25HQ80 等替代闪存芯片，例如 JEDEC ID `0xB36014`。更新加载器可能在少量写入请求后掉线，反复点击 Install 无法解决。
 
-Firmware installation can overwrite the current firmware and data layout.
+使用 [M-Flasher](https://github.com/jvitkauskas/m-flasher/releases/latest) 进入芯片底层下载模式：
 
-- Save your projects with the firmware's own editor when possible.
-- Make a complete flash backup with M-Flasher before changing firmware.
-- Do not unplug the FM-1 while it is writing.
-- Verify the firmware is intended for the FM-1 and matches your hardware revision.
-- Treat every downloaded third-party package as untrusted software. The script verifies integrity; it does not prove that the firmware itself is safe or suitable.
-- A successful checksum proves the file matches the catalogue. It does not guarantee compatibility with a particular flash chip.
+1. **先完整备份闪存。**
+2. 打开 **Download Mode**。
+3. 点击 **Install firmware (.fwsc)** 并选择已下载的固件。
+4. 等待校验完成并重启。
 
-The catalogue currently provides SHA-256 values for firmware packages. The userscript checks those values before enabling a saved download.
+脚本只能证明文件与网页目录一致，不能保证固件适配所有硬件版本或闪存芯片。
 
-## Privacy
-
-The script has no analytics, telemetry, or remote code execution. It communicates only with:
-
-- `thefirmwarehub.com` for the public catalogue and firmware packages;
-- links you explicitly click, such as M-Flasher releases or a project page.
-
-The script stores a cached copy of the firmware catalogue in the page's local storage so it can still display metadata when a refresh temporarily fails.
-
-## Compatibility
-
-- Chrome or Edge with Tampermonkey or Violentmonkey
-- Desktop browsers
-- The Firmware Hub's normal Web MIDI installer is still required for **Flash via Hub**
-- A native tool such as M-Flasher is required when browser-based update loaders are incompatible with the installed flash chip
-
-## Repository layout
-
-```text
-fm1-firmware-downloader.user.js  Main userscript
-README.md                        Usage, flashing, and recovery guide
-LICENSE                          MIT license
-```
-
-## Contributing
-
-Bug reports and compatibility reports are welcome. Include:
-
-- browser and userscript-manager versions;
-- FM-1 firmware identity and flash JEDEC ID, if known;
-- whether download verification succeeded;
-- the exact message shown by The Firmware Hub;
-- whether M-Flasher completed the install and verified the flash.
-
-Never publish full flash backups. They may contain device identifiers, Bluetooth pairing data, projects, samples, and other personal data.
-
-## License
-
-This userscript is released under the MIT License.
-
-The firmware packages remain the property of their respective authors and retain their own licenses. The Firmware Hub and M-Flasher are independent projects. This repository does not bundle or redistribute firmware images.
-
+MIT 许可证。仓库不包含任何固件镜像。
