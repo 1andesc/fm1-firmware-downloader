@@ -2,9 +2,18 @@
 
 **English** | [简体中文](#chinese)
 
-# FM-1 Firmware Downloader and Flash Helper
+# FM-1 Firmware Downloader, Flash Helper & UC25HQ80 Fix
 
 A Tampermonkey / Violentmonkey userscript for [The Firmware Hub](https://thefirmwarehub.com/). It adds firmware search, verified downloads, one-click Hub flashing, and a native recovery route for incompatible flash chips.
+
+> [!IMPORTANT]
+> **Field result:** an experimental SLOOP 2.8.4 build with a small flash-ID allowlist change was installed on one FM-1 using UC25HQ80 (`0xB36014`). The user reported that installation succeeded and project saving became available. The fix adds `0xB36014` beside the existing `0x856014`; unknown IDs remain rejected.
+>
+> **Change scope:** 5 production files, +23/−4 lines; main application +56 bytes and update loader +22 bytes. Low-level SPI commands, flash layout, timeouts, protection bits, and project format were not changed.
+>
+> **Experimental:** back up the whole flash first. A cold-power-cycle test was not explicitly documented, so save a test project, power off, restart, and reload it before trusting important work.
+
+**[Experimental firmware](https://github.com/1andesc/fm1-firmware-downloader/releases/download/uc25hq80-experimental-v1/sloop-2.8.4-UC25HQ80-EXPERIMENTAL.fwsc)** · **[Complete corresponding source](https://github.com/1andesc/fm1-firmware-downloader/releases/download/uc25hq80-experimental-v1/SLOOP-2.8.4-UC25HQ80-EXPERIMENTAL-source.zip)** · **[Case report](docs/compatibility/sloop-2.8.4-uc25hq80.md)** · **[Source patch](docs/patches/sloop-2.8.4-uc25hq80.patch)**
 
 ## Install
 
@@ -19,6 +28,7 @@ A Tampermonkey / Violentmonkey userscript for [The Firmware Hub](https://thefirm
 - Verifies file size and SHA-256 before saving.
 - **Flash via Hub** launches the Hub's native Web MIDI installer.
 - Detects common web-flash failures and links to native recovery.
+- Documents an experimental UC25HQ80 persistence and update-loader patch.
 
 ## Screenshots
 
@@ -66,9 +76,18 @@ Downloader userscript: MIT. The third-party source patch under `docs/patches/` i
 
 [English](#english) | **简体中文**
 
-# FM-1 固件下载与刷写助手
+# FM-1 固件下载、刷写助手与 UC25HQ80 修复
 
 这是一个适用于 [The Firmware Hub](https://thefirmwarehub.com/) 的 Tampermonkey / Violentmonkey 用户脚本，提供固件搜索、校验下载、网页刷写和不兼容闪存芯片的底层恢复路径。
+
+> [!IMPORTANT]
+> **实机反馈：** 一台采用 UC25HQ80（`0xB36014`）的 FM-1 已成功安装修改后的 SLOOP 2.8.4 实验固件，用户反馈“成功刷入且具备保存功能”。修复在原有 `0x856014` 之外增加 `0xB36014`，未知 ID 仍会被拒绝。
+>
+> **修改规模：** 固件本体 5 个文件，新增 23 行、删除 4 行；主程序增加 56 字节，更新加载器增加 22 字节。底层 SPI 指令、地址布局、超时、写保护位和项目格式均未修改。
+>
+> **仍属实验版：** 必须先完整备份闪存。目前没有明确记录拔掉 USB 后的完整冷启动保存测试，请先保存测试工程、关机重启并重新加载，再依赖它保存重要作品。
+
+**[实验固件](https://github.com/1andesc/fm1-firmware-downloader/releases/download/uc25hq80-experimental-v1/sloop-2.8.4-UC25HQ80-EXPERIMENTAL.fwsc)** · **[完整对应源码](https://github.com/1andesc/fm1-firmware-downloader/releases/download/uc25hq80-experimental-v1/SLOOP-2.8.4-UC25HQ80-EXPERIMENTAL-source.zip)** · **[案例报告](docs/compatibility/sloop-2.8.4-uc25hq80.md)** · **[源码补丁](docs/patches/sloop-2.8.4-uc25hq80.patch)**
 
 ## 安装
 
@@ -83,6 +102,7 @@ Downloader userscript: MIT. The third-party source patch under `docs/patches/` i
 - 保存前校验文件大小和 SHA-256。
 - **Flash via Hub** 调用网页自带的 Web MIDI 刷写流程。
 - 检测常见失败，并提供底层恢复入口。
+- 记录并展示 UC25HQ80 持久化与更新加载器的实验补丁。
 
 ## 界面预览
 
