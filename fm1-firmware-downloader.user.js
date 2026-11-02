@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         FM-1 Firmware Downloader and Flash Helper
 // @namespace    fm1-firmware-downloader
-// @version      1.1.0
+// @version      1.1.1
 // @description  Browse, verify, download, and launch installation of the latest FM-1 firmware from The Firmware Hub. Includes a native-recovery path for incompatible flash chips.
 // @author       1andesc
 // @homepageURL  https://github.com/1andesc/fm1-firmware-downloader
@@ -453,28 +453,28 @@
         border: 1px solid #40393b; border-radius: 9px; padding: 9px 11px; outline: none;
       }
       input:focus, select:focus { border-color: #42f5f5; box-shadow: 0 0 0 3px #42f5f522; }
-      .controls button, .actions button {
+      .controls button, .fm1-actions button {
         color: #efe8e1; background: #282324; border: 1px solid #4a4143; border-radius: 9px; padding: 8px 12px;
       }
-      .controls button:hover, .actions button:hover:not(:disabled) { border-color: #42f5f5; }
+      .controls button:hover, .fm1-actions button:hover:not(:disabled) { border-color: #42f5f5; }
       .status { padding: 0 17px 9px; color: #aaa19c; font-size: 12px; }
       .status[data-tone="ok"] { color: #5fe3a1; }
       .status[data-tone="error"] { color: #ff7b88; }
       .list { overflow: auto; padding: 0 10px 10px; scrollbar-color: #4a4143 transparent; }
-      .row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; padding: 13px 8px; border-bottom: 1px solid #2c2729; }
-      .heading { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-      .name { font-size: 16px; color: #fff; }
-      .version { color: #afd9f4; font-size: 12px; }
-      .details { margin-top: 3px; color: #9f9792; font-size: 12px; }
-      .description { margin-top: 5px; color: #c8c0ba; font-size: 12px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-      .row-status { min-height: 17px; margin-top: 4px; color: #9f9792; font-size: 11px; }
-      .row-status[data-tone="ok"] { color: #5fe3a1; }
-      .row-status[data-tone="error"] { color: #ff7b88; }
-      .actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
-      .actions .flash { color: #ffc76b; border-color: #755d2e; font-weight: 700; }
-      .actions .download { color: #071311; background: #42f5f5; border-color: #42f5f5; font-weight: 800; }
-      .actions button:disabled { opacity: .45; cursor: not-allowed; }
-      .empty { padding: 50px 15px; text-align: center; color: #9f9792; }
+      .fm1-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; padding: 13px 8px; border-bottom: 1px solid #2c2729; }
+      .fm1-heading { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+      .fm1-name { font-size: 16px; color: #fff; }
+      .fm1-version { color: #afd9f4; font-size: 12px; }
+      .fm1-details { margin-top: 3px; color: #9f9792; font-size: 12px; }
+      .fm1-description { margin-top: 5px; color: #c8c0ba; font-size: 12px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .fm1-row-status { min-height: 17px; margin-top: 4px; color: #9f9792; font-size: 11px; }
+      .fm1-row-status[data-tone="ok"] { color: #5fe3a1; }
+      .fm1-row-status[data-tone="error"] { color: #ff7b88; }
+      .fm1-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+      .fm1-actions .fm1-flash { color: #ffc76b; border-color: #755d2e; font-weight: 700; }
+      .fm1-actions .fm1-download { color: #071311; background: #42f5f5; border-color: #42f5f5; font-weight: 800; }
+      .fm1-actions button:disabled { opacity: .45; cursor: not-allowed; }
+      .fm1-empty { padding: 50px 15px; text-align: center; color: #9f9792; }
       .foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid #342e30; padding: 9px 17px; color: #827a76; font-size: 11px; }
       .foot .recovery { color: #ffc76b; font-weight: 700; }
       .toast {
@@ -490,8 +490,8 @@
       @media (max-width: 620px) {
         .controls { grid-template-columns: 1fr 1fr; }
         .controls input { grid-column: 1 / -1; }
-        .row { grid-template-columns: 1fr; }
-        .actions { justify-content: flex-end; }
+        .fm1-row { grid-template-columns: 1fr; }
+        .fm1-actions { justify-content: flex-end; }
         .panel { right: 8px; width: calc(100vw - 16px); bottom: 64px; }
         .launcher { right: 12px; bottom: 12px; }
       }

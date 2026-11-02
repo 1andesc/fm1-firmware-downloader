@@ -20,6 +20,12 @@ A Tampermonkey / Violentmonkey userscript for [The Firmware Hub](https://thefirm
 - **Flash via Hub** launches the Hub's native Web MIDI installer.
 - Detects common web-flash failures and links to native recovery.
 
+## Screenshots
+
+![FM-1 firmware panel with download, flash, and recovery controls](docs/screenshots/download-flash-panel.png)
+
+![Download buttons added to firmware cards](docs/screenshots/card-download-buttons.png)
+
 ## Recovery for web-flash failures
 
 Some FM-1 units use an alternate flash chip, such as UC25HQ80 (`0xB36014`). Their firmware update loader may disconnect after a few write requests. This is not fixed by repeatedly pressing Install.
@@ -58,6 +64,12 @@ MIT licensed. No firmware images are bundled.
 - 保存前校验文件大小和 SHA-256。
 - **Flash via Hub** 调用网页自带的 Web MIDI 刷写流程。
 - 检测常见失败，并提供底层恢复入口。
+
+## 界面预览
+
+![FM-1 固件面板：下载、网页刷写与底层恢复](docs/screenshots/download-flash-panel.png)
+
+![固件卡片旁的下载按钮](docs/screenshots/card-download-buttons.png)
 
 ## 网页刷写失败时
 
