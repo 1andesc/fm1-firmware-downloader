@@ -39,9 +39,12 @@ Use [M-Flasher](https://github.com/jvitkauskas/m-flasher/releases/latest) to acc
 5. Wait until M-Flasher detects the unit, usually shown as `WL82 UBOOT1.00`, and reads the flash.
 6. Click **Back up the whole flash** and keep the generated backup.
 7. Click **Install firmware (.fwsc)**, select the downloaded package, and review the sectors M-Flasher will change.
-8. Start the installation. Do not unplug the cable until every sector has been written and verified.
-9. Click **Restart** or power-cycle the FM-1, then verify the firmware version in the device menu.
-10. Restore the backup through M-Flasher if you need to return to the previous firmware.
+8. When switching between different firmware families or data layouts, tick **Also erase settings and Bluetooth pairings**. Back up first: this clears the old settings but prevents stale presets or settings from being misread. Leave **Also put back the package's stock bootloader** unticked unless recovery specifically requires it.
+9. Start the installation. Do not unplug the cable until every sector has been written and verified.
+10. Click **Restart** or power-cycle the FM-1, then verify the firmware version in the device menu.
+11. Restore the backup through M-Flasher if you need to return to the previous firmware.
+
+Clearing settings does not fix a flash-ID incompatibility. If persistence still fails after a clean install, the firmware likely does not support the installed flash chip.
 
 Official instructions: <https://github.com/jvitkauskas/m-flasher/blob/main/docs/usage.md>
 
@@ -94,9 +97,12 @@ MIT licensed. No firmware images are bundled.
 5. 等待 M-Flasher 识别设备并读取闪存，通常会显示 `WL82 UBOOT1.00`。
 6. 点击 **Back up the whole flash**，妥善保存完整备份。
 7. 点击 **Install firmware (.fwsc)**，选择下载的固件，并检查将要改动的扇区。
-8. 开始写入；所有扇区完成并校验前不要拔线。
-9. 点击 **Restart** 或重新开关 FM-1，在设备菜单确认固件版本。
-10. 如需恢复旧固件，使用 M-Flasher 的备份恢复功能。
+8. 在不同固件家族或数据布局之间切换时，勾选 **Also erase settings and Bluetooth pairings**。必须先备份；这会清除旧设置，避免新固件误读遗留的预设或配置。除非恢复操作明确需要，否则不要勾选 **Also put back the package's stock bootloader**。
+9. 开始写入；所有扇区完成并校验前不要拔线。
+10. 点击 **Restart** 或重新开关 FM-1，在设备菜单确认固件版本。
+11. 如需恢复旧固件，使用 M-Flasher 的备份恢复功能。
+
+清除设置不能修复闪存 ID 不兼容。如果干净安装后仍然无法保存，固件很可能不支持当前闪存芯片。
 
 M-Flasher 官方说明：<https://github.com/jvitkauskas/m-flasher/blob/main/docs/usage.md>
 
