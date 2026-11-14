@@ -143,3 +143,5 @@ M-Flasher 官方说明：<https://github.com/jvitkauskas/m-flasher/blob/main/doc
 脚本只能证明文件与网页目录一致，不能保证固件适配所有硬件版本或闪存芯片。
 
 下载器用户脚本使用 MIT 许可证；`docs/patches/` 中的第三方源码补丁使用 GPL-3.0-only。仓库不包含任何固件镜像。
+
+Related: try FM-1 firmwares in the browser with the free community [FM-1 Emulator](https://fm1-emulator.atst.tools/).
